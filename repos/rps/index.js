@@ -1,50 +1,73 @@
-const rockPaperScissors = ['Rock', 'Paper', 'Scissors'];
-const outCome = ['Draw', 'Computer wins', 'You win'];
+const ROCK          = 0;
+const PAPER         = 1;
+const SCISSORS      = 2;
+const GAME_ABORTED  = -1;
+const MAX_ROUNDS    = 5;
+    
+// 0 draw 1 computer 2 human
+const DRAW          = 0;
+const COMPUTER_WINS = 1;
+const HUMAN_WINS    = 2;
 
-let humanScore = 0;
-let computerScore = 0;
-let round = 1;
-let humanSelection = 0;
+const rockPaperScissors = ['Rock', 'Paper', 'Scissors'];
+const outComeText       = ['Draw', 'Computer wins', 'You win'];
+
+let humanScore     = 0;
+let computerScore  = 0;
+let round          = 1;
+let humanSelection;
+let outcome        = DRAW;
 
 function getComputerChoice () {
-    // 0 rock 1 paper 2 scissors
-    return  Math.floor(Math.random() * 3) ;
+    // 0=rock 1=paper 2=scissors
+    return Math.floor(Math.random() * 3) ;
 }
+
+
 
 function getHumanChoice () {
-    // 0 rock 1 paper 2 scissors
-    do {
-        choice = prompt("Rock (0) Paper (1) Scissors (2)?");
-        if (choice === null) return -1;
-        else if (choice != '0' && choice != '1' && choice != '2') {
-            console.error("Please enter 0,1 or 2");
-        }
-    }
-    while (choice != '0' && choice != '1' && choice != '2');
+    // input 0 for rock, 1 for paper or 2 for scissors
+    // or click cancel to quit the game.
+    let choice;
 
-    return parseInt(choice);
+    do {
+        const getChoice = prompt("Rock (0) Paper (1) Scissors (2)?");
+        if (getChoice === null) return GAME_ABORTED;
+        else {
+            choice = parseInt(getChoice);
+            if (choice != ROCK && choice != PAPER && choice != SCISSORS) console.error("Please enter 0,1 or 2");
+        }
+        
+    }
+    while (choice != ROCK && choice != PAPER && choice != SCISSORS);
+
+    return choice;
 }
+
+
 
 function playRound (humanChoice, computerChoice) {
-    // 0 draw 1 computer 2 human
-    let result = 0;
 
-    if (humanChoice === 0) result = computerChoice;
-    if (humanChoice === 1) result = computerChoice === 0 ? 2 : 1;
-    if (humanChoice === 2) result = computerChoice === 0 ? 1 : 2;
+    let result = DRAW;
 
-    if (result === 1) computerScore++;
-    if (result === 2) humanScore++;
+    // 0 rock 1 paper 2 scissors
+    if (humanChoice === ROCK) result = computerChoice === PAPER ? COMPUTER_WINS: HUMAN_WINS;
+    if (humanChoice === PAPER) result = computerChoice === SCISSORS ? COMPUTER_WINS: HUMAN_WINS;
+    if (humanChoice === SCISSORS) result = computerChoice === ROCK ? COMPUTER_WINS: HUMAN_WINS;
 
-    console.log(outCome[result]);
+    if (result === COMPUTER_WINS) computerScore++;
+    if (result === HUMAN_WINS) humanScore++;
+
+    console.log(outComeText[result]);
 
 }
 
+
 // main
-while (humanSelection != -1 && round <= 5) {
+while (humanSelection != GAME_ABORTED && round <= MAX_ROUNDS) {
     humanSelection = getHumanChoice();
 
-    if (humanSelection != -1) {
+    if (humanSelection != GAME_ABORTED) {
 
         const computerSelection = getComputerChoice();
 
@@ -59,5 +82,16 @@ while (humanSelection != -1 && round <= 5) {
 
 } 
 
-humanSelection === -1 ? console.log(`Game aborted.`) : console.log(`Game over. ${humanScore > computerScore ? outCome[2] : outCome[1]} !`);
+if (humanSelection === GAME_ABORTED) console.log(`Game aborted.`)
+else {
 
+    if (humanScore === computerScore) outcome = DRAW
+    else 
+        if (humanScore >= computerScore) outcome = HUMAN_WINS 
+        else outcome = COMPUTER_WINS;
+        
+
+    console.log(`Game over. ${outComeText[outcome]} !`);
+}
+
+// eof
