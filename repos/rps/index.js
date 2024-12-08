@@ -1,54 +1,43 @@
 const ROCK          = 0;
 const PAPER         = 1;
 const SCISSORS      = 2;
-const GAME_ABORTED  = -1;
-const MAX_ROUNDS    = 5;
+const WINNING_SCORE = 5;
     
-// 0 draw 1 computer 2 human
-const DRAW          = 0;
-const COMPUTER_WINS = 1;
-const HUMAN_WINS    = 2;
+const COMPUTER_WINS = 0;
+const HUMAN_WINS    = 1;
 
 const rockPaperScissors = ['Rock', 'Paper', 'Scissors'];
-const outComeText       = ['Draw', 'Computer wins', 'You win'];
+const outComeText       = ['Computer wins', 'You win'];
 
 let humanScore     = 0;
 let computerScore  = 0;
-let round          = 1;
-let humanSelection;
-let outcome        = DRAW;
+
+const bRock      = document.querySelector("#rock");
+const bPaper     = document.querySelector("#paper");
+const bScissors  = document.querySelector("#scissors");
+const human      = document.querySelector("#human");
+const computer   = document.querySelector("#computer");
+const resultText =  document.querySelector("#gameresult");
+
+
+bRock.addEventListener("click", function(){
+    playRound(0, getComputerChoice());
+});
+
+bPaper.addEventListener("click", function(){
+    playRound(1, getComputerChoice());
+});
+
+bScissors.addEventListener("click", function(){
+    playRound(2, getComputerChoice());
+});
 
 function getComputerChoice () {
     // 0=rock 1=paper 2=scissors
     return Math.floor(Math.random() * 3) ;
 }
 
-
-
-function getHumanChoice () {
-    // input 0 for rock, 1 for paper or 2 for scissors
-    // or click cancel to quit the game.
-    let choice;
-
-    do {
-        const getChoice = prompt("Rock (0) Paper (1) Scissors (2)?");
-        if (getChoice === null) return GAME_ABORTED;
-        else {
-            choice = parseInt(getChoice);
-            if (choice != ROCK && choice != PAPER && choice != SCISSORS) console.error("Please enter 0,1 or 2");
-        }
-        
-    }
-    while (choice != ROCK && choice != PAPER && choice != SCISSORS);
-
-    return choice;
-}
-
-
-
 function playRound (humanChoice, computerChoice) {
-
-    let result = DRAW;
 
     // 0 rock 1 paper 2 scissors
     if (humanChoice === ROCK) result = computerChoice === PAPER ? COMPUTER_WINS: HUMAN_WINS;
@@ -58,40 +47,23 @@ function playRound (humanChoice, computerChoice) {
     if (result === COMPUTER_WINS) computerScore++;
     if (result === HUMAN_WINS) humanScore++;
 
-    console.log(outComeText[result]);
+    human.textContent = humanScore;
+    computer.textContent = computerScore;
 
-}
+    resultText.textContent = `You: ${rockPaperScissors[humanChoice]} Computer: ${rockPaperScissors[computerChoice]} ` + outComeText[result];
 
+    if (humanScore >= WINNING_SCORE) outcome = HUMAN_WINS;
+    if (computerScore >= WINNING_SCORE) outcome = COMPUTER_WINS;
 
-// main
-while (humanSelection != GAME_ABORTED && round <= MAX_ROUNDS) {
-    humanSelection = getHumanChoice();
+    if (humanScore >= WINNING_SCORE || computerScore >= WINNING_SCORE) {
+        alert(`Game over. ${outComeText[outcome]} !`);
+        humanScore     = 0;
+        computerScore  = 0;
+        human.textContent = humanScore;
+        computer.textContent = computerScore;        
+        resultText.textContent = '';
+    };
 
-    if (humanSelection != GAME_ABORTED) {
-
-        const computerSelection = getComputerChoice();
-
-        console.log(`You: ${rockPaperScissors[humanSelection]} Computer: ${rockPaperScissors[computerSelection]}`);
-        
-        playRound(humanSelection, computerSelection);
-
-        console.log(`Score: You ${humanScore} Computer ${computerScore}`);
-
-        round++;
-    }
-
-} 
-
-if (humanSelection === GAME_ABORTED) console.log(`Game aborted.`)
-else {
-
-    if (humanScore === computerScore) outcome = DRAW
-    else 
-        if (humanScore >= computerScore) outcome = HUMAN_WINS 
-        else outcome = COMPUTER_WINS;
-        
-
-    console.log(`Game over. ${outComeText[outcome]} !`);
 }
 
 // eof
